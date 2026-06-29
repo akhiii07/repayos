@@ -104,6 +104,13 @@ export const PERSONA_CONFIGS: PersonaConfig[] = [
       platformTenureMonths: 22,
       payoutCadence: { frequency: 'weekly', weekday: 5 }, // Friday
       tagline: 'Stable earner with a healthy buffer — safe to collect now.',
+      cityZone: 'Koramangala, Bengaluru',
+      platformRating: 4.8,
+      tripsLast30Days: 468,
+      activeHoursLast7Days: 52,
+      currentIncentiveLabel: '₹200 for 8 more orders today',
+      currentIncentiveTarget: 8,
+      currentIncentiveCompleted: 5,
     },
     behavior: {
       avgActiveDaysPerWeek: 6,
@@ -161,6 +168,13 @@ export const PERSONA_CONFIGS: PersonaConfig[] = [
       platformTenureMonths: 15,
       payoutCadence: { frequency: 'weekly', weekday: 2 }, // Tuesday -> next payout 2 days after anchor
       tagline: 'Reliable earner, temporary cash dip — waiting 2 days avoids a bounce.',
+      cityZone: 'Kothrud, Pune',
+      platformRating: 4.6,
+      tripsLast30Days: 392,
+      activeHoursLast7Days: 48,
+      currentIncentiveLabel: '₹100 for 4 more orders today',
+      currentIncentiveTarget: 4,
+      currentIncentiveCompleted: 2,
     },
     behavior: {
       avgActiveDaysPerWeek: 6,
@@ -219,6 +233,13 @@ export const PERSONA_CONFIGS: PersonaConfig[] = [
       platformTenureMonths: 19,
       payoutCadence: { frequency: 'weekly', weekday: 1 }, // Monday -> small payout 1 day after anchor
       tagline: 'Declining income, single platform, recent bounce — collect-now would likely fail.',
+      cityZone: 'Dwarka, New Delhi',
+      platformRating: 3.9,
+      tripsLast30Days: 224,
+      activeHoursLast7Days: 28,
+      currentIncentiveLabel: '₹80 for 3 more trips today',
+      currentIncentiveTarget: 3,
+      currentIncentiveCompleted: 1,
     },
     behavior: {
       avgActiveDaysPerWeek: 4,
@@ -279,6 +300,13 @@ export const PERSONA_CONFIGS: PersonaConfig[] = [
       platformTenureMonths: 3,
       payoutCadence: { frequency: 'weekly', weekday: 5 }, // Friday
       tagline: 'New borrower with only 4 weeks of data — promising but unproven.',
+      cityZone: 'Banjara Hills, Hyderabad',
+      platformRating: 4.4,
+      tripsLast30Days: 280,
+      activeHoursLast7Days: 38,
+      currentIncentiveLabel: '₹150 for 6 more orders today',
+      currentIncentiveTarget: 6,
+      currentIncentiveCompleted: 4,
     },
     behavior: {
       avgActiveDaysPerWeek: 5,

@@ -14,7 +14,7 @@ export function Card({ elevated = false, flush = false, className, children, ...
     <div
       className={cn(
         'rounded-card border border-border',
-        elevated ? 'bg-surface-2 shadow-lg shadow-black/30' : 'bg-surface',
+        elevated ? 'bg-surface-2 shadow-md shadow-black/8' : 'bg-surface shadow-sm shadow-black/5',
         flush ? '' : 'p-5',
         className,
       )}

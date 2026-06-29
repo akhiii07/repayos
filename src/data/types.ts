@@ -38,6 +38,22 @@ export interface BorrowerProfile {
   payoutCadence: PayoutCadence;
   /** One-line human description for admin / showcase. */
   tagline: string;
+
+  /* ── Zomato operational context ─────────────────────────────────── */
+  /** Sub-area where the rider primarily works, e.g. "Koramangala, Bengaluru". */
+  cityZone: string;
+  /** Platform star rating, 1.0–5.0. */
+  platformRating: number;
+  /** Total deliveries / trips completed in the last 30 days. */
+  tripsLast30Days: number;
+  /** Total hours logged on-platform in the last 7 days. */
+  activeHoursLast7Days: number;
+  /** Human-readable incentive target, e.g. "₹200 for 8 more orders". */
+  currentIncentiveLabel: string;
+  /** Total trips required for the current incentive tier. */
+  currentIncentiveTarget: number;
+  /** Trips completed so far toward the current incentive. */
+  currentIncentiveCompleted: number;
 }
 
 /**

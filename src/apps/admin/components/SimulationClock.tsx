@@ -62,7 +62,7 @@ export function SimulationClock() {
               'rounded-pill border px-2.5 py-1 text-[11px] font-medium transition-colors',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50',
               activeScenarioId === s.id
-                ? 'border-brand-500/50 bg-brand-500/15 text-brand-300'
+                ? 'border-brand-500/40 bg-brand-500/10 text-brand-600'
                 : 'border-border bg-elevated text-muted hover:text-ink hover:border-border-strong',
             )}
           >

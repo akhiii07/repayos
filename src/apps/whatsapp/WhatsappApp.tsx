@@ -62,7 +62,7 @@ function Chat({ assessment }: { assessment: Assessment }) {
           <LogoMark size={22} />
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-[#e9edef]">RepayOS</p>
+          <p className="text-sm font-semibold text-[#e9edef]">Partner Finance</p>
           <p className="text-[11px] text-[#8696a0]">online</p>
         </div>
       </div>

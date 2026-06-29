@@ -58,7 +58,7 @@ export function ConsumerSurface({ caption, screenClassName, children }: Consumer
                 'flex items-center gap-2 rounded-pill border py-1 pl-1 pr-3 text-xs font-medium transition-colors',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50',
                 active
-                  ? 'border-brand-500/50 bg-brand-500/15 text-ink'
+                  ? 'border-brand-500/40 bg-brand-500/10 text-ink'
                   : 'border-border bg-surface text-muted hover:text-ink',
               )}
             >

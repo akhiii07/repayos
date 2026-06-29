@@ -18,8 +18,8 @@ const variantClasses: Record<Variant, string> = {
     'bg-brand-500 text-white hover:bg-brand-400 active:bg-brand-600 shadow-sm shadow-brand-700/40',
   secondary: 'bg-elevated text-ink border border-border hover:border-border-strong hover:bg-surface-2',
   ghost: 'text-muted hover:text-ink hover:bg-elevated',
-  success: 'bg-success text-white hover:bg-success-strong',
-  danger: 'bg-danger text-white hover:bg-danger-strong',
+  success: 'bg-success text-white hover:opacity-90',
+  danger: 'bg-danger text-white hover:opacity-90',
 };
 
 const sizeClasses: Record<Size, string> = {

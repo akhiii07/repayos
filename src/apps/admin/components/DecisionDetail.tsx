@@ -57,7 +57,7 @@ export function DecisionDetail({ assessment, asOf }: { assessment: Assessment; a
           <Gauge value={decision.probabilityAtPayout} isFraction caption="At next payout" size={104} />
           <Gauge value={decision.probabilityAtDue} isFraction caption="At due date" size={104} />
           <div className="flex flex-col items-center gap-1">
-            <div className="tnum text-2xl font-bold text-danger-strong">{percent(decision.emiFailureRiskNow)}</div>
+            <div className="tnum text-2xl font-bold text-danger">{percent(decision.emiFailureRiskNow)}</div>
             <div className="text-[10px] uppercase tracking-wide text-faint">failure risk now</div>
             <StatusChip intent={penalty.intent} dot>
               {penalty.label} penalty risk

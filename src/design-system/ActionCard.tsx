@@ -42,13 +42,13 @@ export function ActionCard({
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-card border bg-surface-2 p-5',
+        'relative overflow-hidden rounded-card border bg-surface shadow-sm shadow-black/5 p-5',
         c.border,
         className,
       )}
     >
-      {/* accent wash */}
-      <div className={cn('pointer-events-none absolute inset-x-0 top-0 h-24 opacity-20', c.bgSolid)} style={{ maskImage: 'linear-gradient(to bottom, black, transparent)' }} />
+      {/* subtle tint wash at top of card */}
+      <div className={cn('pointer-events-none absolute inset-x-0 top-0 h-20 opacity-[0.07]', c.bgSolid)} style={{ maskImage: 'linear-gradient(to bottom, black, transparent)' }} />
 
       <div className="relative">
         <div className="flex items-start gap-3">

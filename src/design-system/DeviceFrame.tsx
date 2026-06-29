@@ -22,11 +22,11 @@ export function DeviceFrame({
 }: DeviceFrameProps) {
   return (
     <div className={cn('flex flex-col items-center gap-3', className)}>
-      <div className="relative rounded-[2.75rem] border border-border-strong bg-black p-2.5 shadow-2xl shadow-black/60">
+      <div className="relative rounded-[2.75rem] border border-[#2a2a2a] bg-[#111] p-2.5 shadow-2xl shadow-black/40">
         {/* side buttons */}
-        <div className="absolute -left-0.5 top-28 h-12 w-0.5 rounded-l bg-border-strong" />
-        <div className="absolute -left-0.5 top-44 h-16 w-0.5 rounded-l bg-border-strong" />
-        <div className="absolute -right-0.5 top-36 h-20 w-0.5 rounded-r bg-border-strong" />
+        <div className="absolute -left-0.5 top-28 h-12 w-0.5 rounded-l bg-[#444]" />
+        <div className="absolute -left-0.5 top-44 h-16 w-0.5 rounded-l bg-[#444]" />
+        <div className="absolute -right-0.5 top-36 h-20 w-0.5 rounded-r bg-[#444]" />
 
         <div
           className={cn(

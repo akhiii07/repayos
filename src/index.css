@@ -3,37 +3,39 @@
 @theme {
   /* ---- Typography ---- */
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
 
-  /* ---- Structural palette (dark) ---- */
-  --color-base: #080b11;
-  --color-surface: #0f1620;
-  --color-surface-2: #161f2b;
-  --color-elevated: #1c2738;
-  --color-border: #243246;
-  --color-border-strong: #33425a;
+  /* ---- Structural palette (light) ---- */
+  --color-base: #F8F8F8;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F8F8F8;
+  --color-elevated: #F0F0F0;
+  --color-border: #ECECEC;
+  --color-border-strong: #D4D4D4;
 
   /* ---- Text ---- */
-  --color-ink: #e8eef6;
-  --color-muted: #97a3b6;
-  --color-faint: #5f6b7e;
+  --color-ink: #1C1C1C;
+  --color-muted: #696969;
+  --color-faint: #9E9E9E;
 
-  /* ---- Brand (indigo / violet) ---- */
-  --color-brand-300: #a5b4fc;
-  --color-brand-400: #818cf8;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
+  /* ---- Brand (Zomato Red) ---- */
+  --color-brand-50:  #FFF0F1;
+  --color-brand-100: #FFD6D9;
+  --color-brand-200: #FFB3B8;
+  --color-brand-300: #FF8A91;
+  --color-brand-400: #EE5560;
+  --color-brand-500: #E23744;
+  --color-brand-600: #C72030;
+  --color-brand-700: #A91925;
 
   /* ---- Semantic ---- */
-  --color-success: #10b981;
-  --color-success-strong: #34d399;
-  --color-warning: #f59e0b;
-  --color-warning-strong: #fbbf24;
-  --color-danger: #f43f5e;
-  --color-danger-strong: #fb7185;
-  --color-info: #38bdf8;
-  --color-info-strong: #7dd3fc;
+  --color-success: #16A34A;
+  --color-success-bg: #F0FDF4;
+  --color-warning: #F59E0B;
+  --color-warning-bg: #FFFBEB;
+  --color-danger: #DC2626;
+  --color-danger-bg: #FEF2F2;
+  --color-info: #2563EB;
+  --color-info-bg: #EFF6FF;
 
   /* ---- Radius ---- */
   --radius-card: 1rem;
@@ -42,7 +44,7 @@
 
 @layer base {
   :root {
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   html,
@@ -54,10 +56,6 @@
   body {
     margin: 0;
     background-color: var(--color-base);
-    background-image:
-      radial-gradient(60rem 40rem at 85% -10%, rgba(99, 102, 241, 0.12), transparent 60%),
-      radial-gradient(50rem 40rem at -10% 110%, rgba(16, 185, 129, 0.08), transparent 55%);
-    background-attachment: fixed;
     color: var(--color-ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -70,8 +68,8 @@
     scrollbar-color: var(--color-border-strong) transparent;
   }
   *::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
   *::-webkit-scrollbar-thumb {
     background-color: var(--color-border-strong);
@@ -79,32 +77,32 @@
   }
 }
 
-/* number tabular alignment helper used across financial UIs */
+/* tabular-nums helper for financial figures */
 @utility tnum {
   font-variant-numeric: tabular-nums;
 }
 
-/* Subtle page entrance, re-triggered on route change via a keyed wrapper. */
-@keyframes repayos-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+/* Page entrance — re-triggered on route change via a keyed wrapper */
+@keyframes zp-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
 }
-
 .animate-fade-in {
-  animation: repayos-fade-in 0.28s ease-out both;
+  animation: zp-fade-in 0.22s ease-out both;
 }
 
-/* Respect users who prefer less motion. */
+/* Screen slide-up — for bottom sheets and card transitions */
+@keyframes zp-slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: none; }
+}
+.animate-slide-up {
+  animation: zp-slide-up 0.28s cubic-bezier(0.34, 1.06, 0.64, 1) both;
+}
+
+/* Reduce motion */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
