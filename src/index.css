@@ -1,0 +1,113 @@
+@import 'tailwindcss';
+
+@theme {
+  /* ---- Typography ---- */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* ---- Structural palette (dark) ---- */
+  --color-base: #080b11;
+  --color-surface: #0f1620;
+  --color-surface-2: #161f2b;
+  --color-elevated: #1c2738;
+  --color-border: #243246;
+  --color-border-strong: #33425a;
+
+  /* ---- Text ---- */
+  --color-ink: #e8eef6;
+  --color-muted: #97a3b6;
+  --color-faint: #5f6b7e;
+
+  /* ---- Brand (indigo / violet) ---- */
+  --color-brand-300: #a5b4fc;
+  --color-brand-400: #818cf8;
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
+
+  /* ---- Semantic ---- */
+  --color-success: #10b981;
+  --color-success-strong: #34d399;
+  --color-warning: #f59e0b;
+  --color-warning-strong: #fbbf24;
+  --color-danger: #f43f5e;
+  --color-danger-strong: #fb7185;
+  --color-info: #38bdf8;
+  --color-info-strong: #7dd3fc;
+
+  /* ---- Radius ---- */
+  --radius-card: 1rem;
+  --radius-pill: 9999px;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-base);
+    background-image:
+      radial-gradient(60rem 40rem at 85% -10%, rgba(99, 102, 241, 0.12), transparent 60%),
+      radial-gradient(50rem 40rem at -10% 110%, rgba(16, 185, 129, 0.08), transparent 55%);
+    background-attachment: fixed;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* thin, themed scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-strong) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--color-border-strong);
+    border-radius: 9999px;
+  }
+}
+
+/* number tabular alignment helper used across financial UIs */
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Subtle page entrance, re-triggered on route change via a keyed wrapper. */
+@keyframes repayos-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-fade-in {
+  animation: repayos-fade-in 0.28s ease-out both;
+}
+
+/* Respect users who prefer less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
