@@ -1,26 +1,37 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { Avatar, DeviceFrame } from '@/design-system';
 import { cn } from '@/lib/cn';
-import { inr, fullDate, percent } from '@/lib/formatters';
+import { inr, fullDate } from '@/lib/formatters';
 import { useSimStore } from '@/store/simStore';
 import { useCohort, useSelectedAssessment, type Assessment } from '@/store/useAssessments';
-import { DynamicFinancialCard } from './components/DynamicFinancialCard';
+import { PayoutCard } from './components/PayoutCard';
+import { EMIDueCard } from './components/EMIDueCard';
+import { LoanScreen } from './screens/LoanScreen';
 import { OfferScreen } from './screens/OfferScreen';
 import { RepayScreen } from './screens/RepayScreen';
 import { ProgressScreen } from './screens/ProgressScreen';
 
+export type Scenario = 'payout' | 'emi-due' | 'targets';
+
+const SCENARIOS: { key: Scenario; label: string; desc: string }[] = [
+  { key: 'payout', label: 'Case 1', desc: 'Payout Received' },
+  { key: 'emi-due', label: 'Case 2', desc: 'EMI Approaching' },
+  { key: 'targets', label: 'Case 3', desc: 'Ride Targets' },
+];
+
 export function PartnerApp() {
   const status = useSimStore((s) => s.status);
   const load = useSimStore((s) => s.load);
-  const asOf = useSimStore((s) => s.asOf);
-  const anchorDate = useSimStore((s) => s.anchorDate);
   const selectedId = useSimStore((s) => s.selectedId);
   const select = useSimStore((s) => s.select);
   const cohort = useCohort();
   const selected = useSelectedAssessment();
+  const [scenario, setScenario] = useState<Scenario>('payout');
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   if (status !== 'ready' || !selected) {
     return (
@@ -31,10 +42,10 @@ export function PartnerApp() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center gap-4 py-8 px-4 bg-base">
-      {/* Demo persona switcher — outside the phone frame */}
+    <div className="flex min-h-screen flex-col items-center gap-5 py-8 px-4 bg-base">
+      {/* Persona switcher */}
       <div className="flex flex-wrap items-center justify-center gap-2">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-faint">Viewing as</span>
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-faint">Rider</span>
         {cohort.map(({ borrower }) => {
           const active = borrower.profile.id === selectedId;
           return (
@@ -54,16 +65,34 @@ export function PartnerApp() {
             </button>
           );
         })}
-        {asOf !== anchorDate && (
-          <span className="rounded-full border border-brand-500/30 bg-brand-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-brand-600">
-            {fullDate(asOf)}
-          </span>
-        )}
+      </div>
+
+      {/* Scenario switcher */}
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-faint">Scenario</span>
+        {SCENARIOS.map(({ key, label, desc }) => {
+          const active = scenario === key;
+          return (
+            <button
+              key={key}
+              onClick={() => setScenario(key)}
+              className={cn(
+                'rounded-full border px-3 py-1.5 text-[11px] font-semibold transition-colors',
+                active
+                  ? 'border-[#E23744] bg-[#E23744] text-white'
+                  : 'border-border bg-surface text-muted hover:text-ink',
+              )}
+            >
+              {label} · {desc}
+            </button>
+          );
+        })}
       </div>
 
       <DeviceFrame caption="Zomato Delivery Partner App">
         <Routes>
-          <Route index element={<HomeScreen assessment={selected} />} />
+          <Route index element={<HomeScreen assessment={selected} scenario={scenario} />} />
+          <Route path="loan" element={<LoanScreen assessment={selected} />} />
           <Route path="offer" element={<OfferScreen assessment={selected} />} />
           <Route path="repay" element={<RepayScreen assessment={selected} />} />
           <Route path="progress" element={<ProgressScreen assessment={selected} />} />
@@ -75,139 +104,177 @@ export function PartnerApp() {
 
 /* ── Home Screen ─────────────────────────────────────────────────── */
 
-function HomeScreen({ assessment }: { assessment: Assessment }) {
+function HomeScreen({ assessment, scenario }: { assessment: Assessment; scenario: Scenario }) {
   const navigate = useNavigate();
   const { borrower, features } = assessment;
   const { profile } = borrower;
   const asOf = useSimStore((s) => s.asOf);
 
-  // Today's earnings from the daily earnings data
   const todayEarning = borrower.earnings.find((e) => e.date === asOf);
   const todayGross = todayEarning?.grossEarnings ?? 0;
   const todayTrips = todayEarning?.trips ?? 0;
   const isOnline = todayGross > 0;
 
-  const incentivePct = Math.round((profile.currentIncentiveCompleted / profile.currentIncentiveTarget) * 100);
+  const paidCount = features.history.paidCount;
+  const totalInstallments = borrower.loan.totalInstallments;
+  const progressPct = Math.round((paidCount / totalInstallments) * 100);
+  const outstanding = borrower.loan.emiAmount * (totalInstallments - paidCount);
+  const incentivePct = Math.min(
+    100,
+    Math.round((profile.currentIncentiveCompleted / profile.currentIncentiveTarget) * 100),
+  );
 
   return (
     <div className="flex flex-col bg-[#F8F8F8] min-h-full">
-      {/* Top header */}
-      <div className="bg-white px-4 pt-12 pb-4">
+      {/* Header */}
+      <div className="bg-white px-4 pt-12 pb-3 border-b border-[#ECECEC]">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[12px] text-[#9E9E9E]">{profile.cityZone}</p>
+            <p className="text-[11px] text-[#9E9E9E]">{profile.cityZone}</p>
             <h1 className="text-[18px] font-bold text-[#1C1C1C]">
-              Hey, {profile.name.split(' ')[0]} 👋
+              {profile.name.split(' ')[0]}
             </h1>
           </div>
-          <Avatar name={profile.name} color={profile.avatarColor} size={44} />
+          <div className="flex items-center gap-2">
+            <div
+              className={cn(
+                'flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold',
+                isOnline
+                  ? 'border-success/30 bg-success/10 text-success'
+                  : 'border-[#ECECEC] bg-[#F0F0F0] text-[#9E9E9E]',
+              )}
+            >
+              <span
+                className={cn(
+                  'h-1.5 w-1.5 rounded-full',
+                  isOnline ? 'bg-success' : 'bg-[#BDBDBD]',
+                )}
+              />
+              {isOnline ? 'Online' : 'Offline'}
+            </div>
+            <Avatar name={profile.name} color={profile.avatarColor} size={40} />
+          </div>
         </div>
 
-        {/* Online/offline + rating */}
-        <div className="mt-3 flex items-center gap-3">
-          <div className={cn(
-            'flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-semibold border',
-            isOnline
-              ? 'bg-success/10 text-success border-success/30'
-              : 'bg-[#F0F0F0] text-[#696969] border-[#ECECEC]',
-          )}>
-            <span className={cn('h-1.5 w-1.5 rounded-full', isOnline ? 'bg-success' : 'bg-[#9E9E9E]')} />
-            {isOnline ? 'Online' : 'Offline'}
-          </div>
-          <div className="flex items-center gap-1 text-[12px] text-[#696969]">
+        {/* Rating strip */}
+        <div className="mt-2 flex items-center gap-3 text-[11px] text-[#9E9E9E]">
+          <span className="flex items-center gap-1">
             <span className="text-[#F59E0B]">★</span>
             <span className="font-semibold text-[#1C1C1C]">{profile.platformRating}</span>
-            <span>· {profile.tripsLast30Days} trips / 30d</span>
-          </div>
+          </span>
+          <span>·</span>
+          <span>{profile.tripsLast30Days} trips / 30d</span>
+          <span>·</span>
+          <span>{profile.activeHoursLast7Days}h active / 7d</span>
         </div>
       </div>
 
-      <div className="flex-1 space-y-3 p-4">
-        {/* Today's earnings */}
-        <div className="rounded-2xl bg-white border border-[#ECECEC] shadow-sm overflow-hidden">
-          <div className="p-4">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#9E9E9E]">Today's Earnings</p>
-            <div className="mt-2 flex items-end justify-between">
-              <div>
-                <p className="text-3xl font-bold text-[#1C1C1C]">{inr(todayGross)}</p>
-                <p className="mt-0.5 text-[12px] text-[#696969]">{todayTrips} orders · {profile.activeHoursLast7Days / 7 | 0}h avg/day this week</p>
-              </div>
-              {isOnline && (
-                <div className="rounded-xl bg-[#F8F8F8] px-3 py-2 text-right">
-                  <p className="text-[10px] text-[#9E9E9E]">Weekly hours</p>
-                  <p className="text-[15px] font-bold text-[#1C1C1C]">{profile.activeHoursLast7Days}h</p>
-                </div>
-              )}
-            </div>
-          </div>
+      {/* Scenario notification cards (Cases 1 & 2) */}
+      {scenario === 'payout' && <PayoutCard assessment={assessment} />}
+      {scenario === 'emi-due' && <EMIDueCard assessment={assessment} />}
 
-          {/* Incentive progress bar */}
-          <div className="border-t border-[#ECECEC] bg-[#F8F8F8] px-4 py-3">
-            <div className="flex items-center justify-between mb-1.5">
-              <p className="text-[11px] font-medium text-[#696969]">{profile.currentIncentiveLabel}</p>
-              <p className="text-[11px] font-semibold text-[#1C1C1C]">
-                {profile.currentIncentiveCompleted}/{profile.currentIncentiveTarget}
+      {/* Case 3: ride goal teaser on home */}
+      {scenario === 'targets' && (
+        <button
+          onClick={() => navigate('loan')}
+          className="mx-4 mt-3 flex items-center justify-between rounded-2xl border border-[#E23744]/30 bg-[#FFF0F1] px-4 py-3 shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-[22px]">🎯</span>
+            <div className="text-left">
+              <p className="text-[13px] font-bold text-[#1C1C1C]">Set a Ride Goal</p>
+              <p className="text-[11px] text-[#696969]">
+                {Math.round(profile.tripsLast30Days / 4.3)} rides this week →{' '}
+                <span className="font-semibold text-[#E23744]">
+                  {inr(Math.round((profile.tripsLast30Days / 4.3) * 95 * 0.2))} toward EMI
+                </span>
               </p>
             </div>
-            <div className="h-2 w-full rounded-full bg-[#ECECEC] overflow-hidden">
+          </div>
+          <span className="text-[#E23744] text-[18px]">›</span>
+        </button>
+      )}
+
+      <div className="flex-1 space-y-3 p-4">
+        {/* Stats grid */}
+        <div className="grid grid-cols-3 gap-2">
+          <StatTile label="Today" value={inr(todayGross)} sub={`${todayTrips} trips`} />
+          <StatTile
+            label="Next payout"
+            value={
+              features.liquidity.daysUntilNextPayout === 0
+                ? 'Today'
+                : `${features.liquidity.daysUntilNextPayout}d`
+            }
+            sub={inr(features.liquidity.expectedNextPayout)}
+          />
+          <StatTile label="Balance" value={inr(features.liquidity.currentBalance)} sub="in account" />
+        </div>
+
+        {/* Incentive */}
+        <div className="rounded-2xl border border-[#ECECEC] bg-white px-4 py-3 shadow-sm">
+          <div className="mb-1.5 flex items-center justify-between">
+            <p className="text-[11px] font-medium text-[#696969]">{profile.currentIncentiveLabel}</p>
+            <p className="text-[11px] font-bold text-[#1C1C1C]">
+              {profile.currentIncentiveCompleted}/{profile.currentIncentiveTarget}
+            </p>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-[#ECECEC]">
+            <div
+              className="h-full rounded-full bg-[#E23744] transition-all duration-500"
+              style={{ width: `${incentivePct}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Loan entry card */}
+        <button
+          onClick={() => navigate('loan')}
+          className="w-full rounded-2xl border border-[#ECECEC] bg-white shadow-sm overflow-hidden text-left"
+        >
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FFF0F1] text-[#E23744] text-[18px] font-bold">
+                ₹
+              </div>
+              <div>
+                <p className="text-[13px] font-bold text-[#1C1C1C]">Loan</p>
+                <p className="text-[11px] text-[#696969]">
+                  {inr(outstanding)} outstanding · due {fullDate(features.liquidity.upcomingEmiDueDate)}
+                </p>
+              </div>
+            </div>
+            <span className="text-[#9E9E9E] text-[20px]">›</span>
+          </div>
+          {/* Loan progress bar */}
+          <div className="border-t border-[#F0F0F0] px-4 py-2 bg-[#F8F8F8]">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[10px] text-[#9E9E9E]">{paidCount} of {totalInstallments} EMIs paid</p>
+              <p className="text-[10px] font-semibold text-[#1C1C1C]">{progressPct}%</p>
+            </div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#ECECEC]">
               <div
-                className="h-full rounded-full bg-[#E23744] transition-all duration-500"
-                style={{ width: `${incentivePct}%` }}
+                className="h-full rounded-full bg-[#E23744] transition-all"
+                style={{ width: `${progressPct}%` }}
               />
             </div>
           </div>
-        </div>
-
-        {/* Dynamic financial card — engine-driven */}
-        <div>
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-[#9E9E9E]">
-            Your Loan
-          </p>
-          <DynamicFinancialCard
-            assessment={assessment}
-            onPayNow={() => navigate('repay')}
-            onViewOffer={() => navigate('offer')}
-            onViewProgress={() => navigate('progress')}
-            onPlanHardship={() => navigate('progress')}
-          />
-        </div>
-
-        {/* Money summary strip */}
-        <div className="grid grid-cols-3 gap-2">
-          <MiniStat label="Balance" value={inr(features.liquidity.currentBalance)} />
-          <MiniStat
-            label="Next payout"
-            value={features.liquidity.daysUntilNextPayout === 0 ? 'Today' : `${features.liquidity.daysUntilNextPayout}d`}
-          />
-          <MiniStat label="Runway" value={`${features.liquidity.runwayDays.toFixed(0)}d`} />
-        </div>
-
-        {/* Platform earnings hint */}
-        <div className="rounded-2xl border border-[#ECECEC] bg-white shadow-sm p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-[#9E9E9E] mb-2">This Month</p>
-          {profile.platforms.map((p) => (
-            <div key={p.name} className="flex items-center justify-between py-1.5">
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-brand-500" />
-                <span className="text-[13px] font-medium text-[#1C1C1C]">{p.name}</span>
-              </div>
-              <span className="text-[12px] text-[#696969]">{percent(p.share)} of income</span>
-            </div>
-          ))}
-        </div>
+        </button>
       </div>
 
-      {/* Bottom nav */}
       <BottomNav active="home" />
     </div>
   );
 }
 
-function MiniStat({ label, value }: { label: string; value: string }) {
+/* ── Sub-components ──────────────────────────────────────────────── */
+
+function StatTile({ label, value, sub }: { label: string; value: string; sub: string }) {
   return (
     <div className="rounded-xl border border-[#ECECEC] bg-white p-3 text-center shadow-sm">
       <p className="text-[10px] text-[#9E9E9E]">{label}</p>
-      <p className="mt-0.5 text-[14px] font-bold text-[#1C1C1C]">{value}</p>
+      <p className="mt-0.5 text-[14px] font-bold text-[#1C1C1C] leading-tight">{value}</p>
+      <p className="text-[10px] text-[#9E9E9E] mt-0.5">{sub}</p>
     </div>
   );
 }
